@@ -1,14 +1,14 @@
-from typing import Optional
-
 from fastapi import FastAPI
+from pydantic import BaseModel
+import autocomplete_trie
 
 app = FastAPI()
 
+class InputData(BaseModel):
+    texts: list[str]
+    query: str
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Optional[str] = None):
-    return {"item_id": item_id, "q": q}
+@app.post("/autocomplete_sell/")
+def predict(data: InputData):
+    result = autocomplete_trie.get_suggestions_api(data.query, data.texts)  # Call your function
+    return {"suggestions": result}
